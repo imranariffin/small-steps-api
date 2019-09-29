@@ -89,7 +89,6 @@ WSGI_APPLICATION = 'smallsteps.wsgi.application'
 
 
 # Database
-# 'postgres://vgalpsrkrqydmr:d5f24f5b9ac038203475be768275029a8a098ae6affd1c188ae26e840f3c403f@ec2-23-23-182-18.compute-1.amazonaws.com:5432/d7h1e1ej7lmf21'
 
 DATABASES = {
     'default': {
