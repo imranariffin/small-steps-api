@@ -7,7 +7,13 @@
     "SECRET_KEY": {
       "required": true
     },
+    "DATABASE_URL": {
+      "required": true
+    },
     "DEBUG": {
+      "required": true
+    },
+    "ENV": {
       "required": true
     }
   },
