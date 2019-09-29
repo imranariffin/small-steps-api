@@ -1,0 +1,20 @@
+{
+  "addons": [
+  ],
+  "buildpacks": [
+  ],
+  "env": {
+    "SECRET_KEY": {
+      "required": true
+    },
+    "DEBUG": {
+      "required": true
+    }
+  },
+  "formation": {
+  },
+  "name": "smallsteps-api",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
