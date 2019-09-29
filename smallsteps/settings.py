@@ -9,6 +9,8 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 DEBUG = bool(int(os.environ['DEBUG']))
 
+ENV = os.environ['ENV']
+
 DATABASE_URL = os.environ['DATABASE_URL']
 
 url_tokenized = DATABASE_URL.replace('postgres://', '').split(':')
