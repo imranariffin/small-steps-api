@@ -3,11 +3,29 @@ import os
 import django_heroku
 
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Environment variables
 
 SECRET_KEY = os.environ['SECRET_KEY']
 
 DEBUG = bool(int(os.environ['DEBUG']))
+
+DATABASE_URL = os.environ['DATABASE_URL']
+
+url_tokenized = DATABASE_URL.replace('postgres://', '').split(':')
+
+DATABASE_NAME = url_tokenized[2].split('/')[1]
+
+DATABASE_USER = url_tokenized[0]
+
+DATABASE_PASSWORD = url_tokenized[1].split('@')[0]
+
+DATABASE_HOST = url_tokenized[1].split('@')[1]
+
+DATABASE_PORT = url_tokenized[2].split('/')[0]
+
+# Django values
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 ALLOWED_HOSTS = ['myurl']
 
@@ -69,12 +87,17 @@ WSGI_APPLICATION = 'smallsteps.wsgi.application'
 
 
 # Database
+# 'postgres://vgalpsrkrqydmr:d5f24f5b9ac038203475be768275029a8a098ae6affd1c188ae26e840f3c403f@ec2-23-23-182-18.compute-1.amazonaws.com:5432/d7h1e1ej7lmf21'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': DATABASE_NAME,
+        'USER': DATABASE_USER,
+        'PASSWORD': DATABASE_PASSWORD,
+        'HOST': DATABASE_HOST,
+        'PORT': DATABASE_PORT,
+    },
 }
 
 
