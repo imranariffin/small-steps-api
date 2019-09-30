@@ -17,6 +17,13 @@
       "required": true
     }
   },
+  "environments": {
+    "test": {
+      "scripts": {
+        "test": "python manage.py test"
+      }
+    }
+  },
   "formation": {
   },
   "name": "smallsteps-api",

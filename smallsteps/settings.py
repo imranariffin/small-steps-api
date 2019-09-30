@@ -1,9 +1,21 @@
 import os
+import sys
 
 import django_heroku
 
 
 # Environment variables
+
+if 'test' in sys.argv[1] and os.environ['ENV'] != 'test-ci':
+    os.environ['SECRET_KEY'] = 'test-secret-key'
+
+    os.environ['DEBUG'] = '1'
+
+    os.environ['ENV'] = 'test'
+
+    os.environ['DATABASE_URL'] = (
+        'postgres://postgres:postgres@127.0.0.1:5432/postgres'
+    )
 
 SECRET_KEY = os.environ['SECRET_KEY']
 
@@ -13,17 +25,6 @@ ENV = os.environ['ENV']
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
-url_tokenized = DATABASE_URL.replace('postgres://', '').split(':')
-
-DATABASE_NAME = url_tokenized[2].split('/')[1]
-
-DATABASE_USER = url_tokenized[0]
-
-DATABASE_PASSWORD = url_tokenized[1].split('@')[0]
-
-DATABASE_HOST = url_tokenized[1].split('@')[1]
-
-DATABASE_PORT = url_tokenized[2].split('/')[0]
 
 # Django values
 
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -93,14 +95,8 @@ WSGI_APPLICATION = 'smallsteps.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': DATABASE_NAME,
-        'USER': DATABASE_USER,
-        'PASSWORD': DATABASE_PASSWORD,
-        'HOST': DATABASE_HOST,
-        'PORT': DATABASE_PORT,
     },
 }
-
 
 # Password validation
 

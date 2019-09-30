@@ -1,9 +1,8 @@
 from django.contrib import admin
-from django.http import JsonResponse
-from django.urls import path
+from django.urls import include, path
 
 
 urlpatterns = [
-    path('', lambda _: JsonResponse({'message': 'Hello, world'})),
+    path('v1/', include('api.urls', namespace='api')),
     path('admin/', admin.site.urls),
 ]
