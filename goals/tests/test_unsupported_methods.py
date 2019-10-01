@@ -1,5 +1,4 @@
 from django.test import TestCase
-from django.urls import reverse
 from django.utils import dateparse
 
 from goals.models import Goal
@@ -8,11 +7,6 @@ from goals.models import Goal
 class TestGoalsUnsupportedMethods(TestCase):
     def setUp(self):
         Goal.objects.all().delete()
-
-    def test_list(self):
-        response = self.client.get(reverse('api:goals-create'))
-
-        self.assertEqual(response.status_code, 405)
 
     def test_retrieve(self):
         goal_existing_id = Goal.objects.create().id

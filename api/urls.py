@@ -8,6 +8,6 @@ urlpatterns = [
     path(
         'goals/',
         goals_views.views,
-        name='goals-create',
+        name='goals-create-list',
     ),
 ]

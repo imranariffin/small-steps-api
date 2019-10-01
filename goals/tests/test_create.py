@@ -7,7 +7,7 @@ from goals.models import Goal
 
 class TestGoalsCreate(TestCase):
     def setUp(self):
-        self.url = reverse('api:goals-create')
+        self.url = reverse('api:goals-create-list')
 
     def test_url(self):
         self.assertEqual(self.url, '/v1/goals/')
