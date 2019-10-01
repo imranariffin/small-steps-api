@@ -7,7 +7,7 @@ app_name = 'api'
 urlpatterns = [
     path(
         'goals/',
-        goals_views.create,
+        goals_views.views,
         name='goals-create',
     ),
 ]
