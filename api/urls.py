@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from goals import views as goals_views
 
 
 app_name = 'api'
@@ -7,7 +7,7 @@ app_name = 'api'
 urlpatterns = [
     path(
         'goals/',
-        views.create,
-        name='goals-create',
+        goals_views.views,
+        name='goals-create-list',
     ),
 ]
