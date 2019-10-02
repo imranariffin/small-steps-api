@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.decorators import api_view
 
-from .models import Goal
+from .models import Goal, GoalDeleted
 
 
 @api_view(['POST', 'GET', 'DELETE'])
@@ -61,10 +61,12 @@ def goals_delete(request, goal_id):
         )
 
     goal.delete()
+    datetime_deleted = GoalDeleted.objects.get(goal=goal.id).created
 
     return JsonResponse(
         {
-           'id': str(goal.id),
+           'id': str(goal_id),
+           'datetime_deleted': datetime_deleted,
         },
         status=status.HTTP_200_OK,
     )
