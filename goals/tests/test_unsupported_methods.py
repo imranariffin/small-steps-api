@@ -15,14 +15,6 @@ class TestGoalsUnsupportedMethods(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_delete(self):
-        goal_existing_id = Goal.objects.create().id
-
-        response = self.client.delete(f'v1/goals/{goal_existing_id}')
-
-        self.assertEqual(response.status_code, 404)
-        self.assertEqual(Goal.objects.all().count(), 1)
-
     def test_update(self):
         goal_existing = Goal.objects.create(
             text='some-original-text',
