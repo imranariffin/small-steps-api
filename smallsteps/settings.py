@@ -6,7 +6,7 @@ import django_heroku
 
 # Environment variables
 
-if 'test' in sys.argv[1] and os.environ['ENV'] != 'test-ci':
+if 'test' in sys.argv[1] and os.environ.get('ENV', '') != 'test-ci':
     os.environ['SECRET_KEY'] = 'test-secret-key'
 
     os.environ['DEBUG'] = '1'
