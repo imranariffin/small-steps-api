@@ -10,4 +10,9 @@ urlpatterns = [
         goals_views.views,
         name='goals-create-list',
     ),
+    path(
+        'goals/<uuid:goal_id>/',
+        goals_views.views,
+        name='goals-delete',
+    ),
 ]
