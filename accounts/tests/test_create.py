@@ -17,7 +17,8 @@ class TestAccountsCreate(TestCase):
                 url,
                 {
                     'device_id': 'some-device-id',
-                }
+                },
+                content_type='application/json',
             )
 
         account_id = Account.objects.get(device_id='some-device-id').id
@@ -39,7 +40,8 @@ class TestAccountsCreate(TestCase):
                 url,
                 {
                     'device_id': 'some-existing-device-id',
-                }
+                },
+                content_type='application/json',
             )
 
         self.assertEqual(response.status_code, 400)
@@ -51,4 +53,25 @@ class TestAccountsCreate(TestCase):
                     'already exists'
                 ),
             }
+        )
+
+    def test_unsupported_media_type(self):
+        url = reverse('api:accounts-create')
+
+        with freeze_time('1970-01-01T12:34:56'):
+            response = self.client.post(
+                url,
+                {},
+                content_type='some-non-json-content-type',
+            )
+
+        self.assertEqual(response.status_code, 415)
+        self.assertEqual(
+            response.json(),
+            {
+                'detail': (
+                    'Unsupported media type '
+                    '"some-non-json-content-type" in request.'
+                ),
+            },
         )
