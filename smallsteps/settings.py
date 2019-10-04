@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # Custom apps
+    'accounts',
     'api',
     'goals',
 ]
