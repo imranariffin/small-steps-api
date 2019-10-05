@@ -1,7 +1,5 @@
 import uuid
 
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from django.db import models, IntegrityError
 from django.utils import timezone
 
@@ -32,5 +30,5 @@ class Task(models.Model):
                 raise IntegrityError(
                     f'Parent with id {self.parent_id} does not exist'
                 )
-        
+
         super().save(*args, **kwargs)

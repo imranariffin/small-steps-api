@@ -14,11 +14,11 @@ class TestTaskModel(TestCase):
 
         count_after = Task.objects.all().count()
         self.assertEqual(count_after, count_before + 1)
-    
+
     def test_parent_empty(self):
         with self.assertRaises(IntegrityError):
             Task.objects.create()
-    
+
     def test_parent_goal_does_not_exist(self):
         goal_id = Goal.objects.create().id
         Goal.objects.all().delete()
