@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from django.db.utils import IntegrityError
 from rest_framework import status
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
@@ -7,6 +8,7 @@ from rest_framework.response import Response
 
 from goals.models import Goal
 from tasks.models import Task
+from tasks.exceptions import ParentDoesNotExist
 
 
 @api_view(['POST', 'GET'])
@@ -32,19 +34,14 @@ def tasks_create(request):
         )
 
     try:
-        Goal.objects.get(id=UUID(parent_id))
-    except Goal.DoesNotExist:
-        try:
-            Task.objects.get(id=UUID(parent_id))
-        except Task.DoesNotExist:
-            return Response(
-                {
-                    'parent_id': f'Parent with id {parent_id} does not exist',
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-    task = Task.objects.create(parent_id=parent_id)
+        task = Task.objects.create(parent_id=parent_id)
+    except ParentDoesNotExist:
+        return Response(
+            {
+                'parent_id': f'Parent with id {parent_id} does not exist',
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     return Response(
         {

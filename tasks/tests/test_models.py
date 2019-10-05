@@ -1,8 +1,9 @@
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
-from tasks.models import Task
 from goals.models import Goal
+from tasks.models import Task
+from tasks.exceptions import ParentDoesNotExist
 
 
 class TestTaskModel(TestCase):
@@ -24,7 +25,7 @@ class TestTaskModel(TestCase):
         Goal.objects.all().delete()
         count_before = Task.objects.all().count()
 
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(ParentDoesNotExist):
             Task.objects.create(parent_id=goal_id)
 
         count_after = Task.objects.all().count()
@@ -36,7 +37,7 @@ class TestTaskModel(TestCase):
         Task.objects.all().delete()
         count_before = Task.objects.all().count()
 
-        with self.assertRaises(IntegrityError):
+        with self.assertRaises(ParentDoesNotExist):
             Task.objects.create(parent_id=task_id)
 
         count_after = Task.objects.all().count()

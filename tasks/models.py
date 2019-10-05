@@ -4,6 +4,7 @@ from django.db import models, IntegrityError
 from django.utils import timezone
 
 from goals.models import Goal
+from tasks.exceptions import ParentDoesNotExist
 
 
 class Task(models.Model):
@@ -27,7 +28,7 @@ class Task(models.Model):
             try:
                 Task.objects.get(id=self.parent_id)
             except Task.DoesNotExist:
-                raise IntegrityError(
+                raise ParentDoesNotExist(
                     f'Parent with id {self.parent_id} does not exist'
                 )
 
