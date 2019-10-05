@@ -1,6 +1,6 @@
 import uuid
 
-from django.db import models
+from django.db import models, utils
 from django.utils import timezone
 
 from goals.models import Goal
@@ -19,6 +19,12 @@ class Task(models.Model):
         blank=False,
         null=False,
         primary_key=False,
+    )
+    text = models.CharField(
+        blank=True,
+        default=None,
+        max_length=200,
+        null=False,
     )
 
     def save(self, *args, **kwargs):
