@@ -10,7 +10,7 @@ from goals.models import Goal
 
 class TestCreateTasks(TestCase):
     def test_url(self):
-        self.assertEqual(reverse('api:tasks-create'), '/v1/tasks/')
+        self.assertEqual(reverse('api:tasks-create-list'), '/v1/tasks/')
 
     def test_create_valid_goal_parent(self):
         goal_existing_id = Goal.objects.create(text='some-parent-text').id
@@ -18,7 +18,7 @@ class TestCreateTasks(TestCase):
 
         with freeze_time('1970-01-01T12:34:56'):
             response = self.client.post(
-                reverse('api:tasks-create'),
+                reverse('api:tasks-create-list'),
                 {
                     'parent_id': goal_existing_id,
                     'text': 'some-tasks-text',
@@ -46,7 +46,7 @@ class TestCreateTasks(TestCase):
 
         with freeze_time('1970-01-01T12:34:56'):
             response = self.client.post(
-                reverse('api:tasks-create'),
+                reverse('api:tasks-create-list'),
                 {
                     'parent_id': task_existing_id,
                     'text': 'some-tasks-text',
@@ -73,7 +73,7 @@ class TestCreateTasks(TestCase):
         goal_existing_id = Goal.objects.create(text='some-goal-text').id
 
         response = self.client.post(
-            reverse('api:tasks-create'),
+            reverse('api:tasks-create-list'),
             {
                 'parent_id': goal_existing_id,
             },
@@ -95,7 +95,7 @@ class TestCreateTasks(TestCase):
         Goal.objects.create(text='some-goal-text')
 
         response = self.client.post(
-            reverse('api:tasks-create'),
+            reverse('api:tasks-create-list'),
             {
                 'text': 'some-tasks-text',
             },
@@ -117,7 +117,7 @@ class TestCreateTasks(TestCase):
         count_before = Task.objects.count()
 
         response = self.client.post(
-            reverse('api:tasks-create'),
+            reverse('api:tasks-create-list'),
             {
                 'text': 'some-tasks-text',
                 'parent_id': parent_id,

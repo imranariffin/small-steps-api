@@ -9,9 +9,17 @@ from goals.models import Goal
 from tasks.models import Task
 
 
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
 @renderer_classes([JSONRenderer])
 def views(request):
+    if request.method == 'POST':
+        return tasks_create(request)
+
+    if request.method == 'GET':
+        return tasks_list(request)
+
+
+def tasks_create(request):
     try:
         text = request.data['text']
         parent_id = request.data['parent_id']
@@ -46,4 +54,21 @@ def views(request):
             'text': text,
         },
         status=status.HTTP_201_CREATED,
+    )
+
+
+def tasks_list(request):
+    return Response(
+        {
+            'tasks': list(map(
+                lambda task: (
+                    {
+                        'id': task.id,
+                        'created': task.created,
+                    }
+                ),
+                Task.objects.all().order_by('-created'),
+            ))
+        },
+        status=status.HTTP_200_OK,
     )

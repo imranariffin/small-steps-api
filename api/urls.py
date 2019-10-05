@@ -26,6 +26,6 @@ urlpatterns = [
     path(
         'tasks/',
         tasks_views.views,
-        name='tasks-create',
+        name='tasks-create-list',
     ),
 ]
