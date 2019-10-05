@@ -1,6 +1,8 @@
 from django.urls import path
-from goals import views as goals_views
+
 from accounts import views as accounts_views
+from goals import views as goals_views
+from tasks import views as tasks_views
 
 
 app_name = 'api'
@@ -20,5 +22,10 @@ urlpatterns = [
         'goals/<uuid:goal_id>/',
         goals_views.views,
         name='goals-delete',
+    ),
+    path(
+        'tasks/',
+        tasks_views.views,
+        name='tasks-create',
     ),
 ]

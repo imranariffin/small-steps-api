@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'accounts',
     'api',
     'goals',
+    'tasks',
 ]
 
 MIDDLEWARE = [
