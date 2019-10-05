@@ -42,7 +42,10 @@ class TestCreateTasks(TestCase):
 
     def test_create_valid_task_parent(self):
         goal_id = Goal.objects.create().id
-        task_existing_id = Task.objects.create(parent_id=goal_id).id
+        task_existing_id = Task.objects.create(
+            parent_id=goal_id,
+            text='some-existing-task-text',
+        ).id
         count_before = Task.objects.count()
 
         with freeze_time('1970-01-01T12:34:56'):

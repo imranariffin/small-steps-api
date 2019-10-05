@@ -16,11 +16,20 @@ class TestTasksList(TestCase):
     def test_list_in_correct_order(self):
         goal_id = Goal.objects.create().id
         with freeze_time('1970-01-01T12:34:51'):
-            task_first = Task.objects.create(parent_id=goal_id)
+            task_first = Task.objects.create(
+                parent_id=goal_id,
+                text='some-task-text-0',
+            )
         with freeze_time('1970-01-01T12:34:52'):
-            task_second = Task.objects.create(parent_id=goal_id)
+            task_second = Task.objects.create(
+                parent_id=goal_id,
+                text='some-task-text-1',
+            )
         with freeze_time('1970-01-01T12:34:53'):
-            task_third = Task.objects.create(parent_id=goal_id)
+            task_third = Task.objects.create(
+                parent_id=goal_id,
+                text='some-task-text-2',
+            )
 
         response = self.client.get(
             reverse('api:tasks-create-list'),

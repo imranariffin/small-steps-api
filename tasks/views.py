@@ -30,7 +30,7 @@ def tasks_create(request):
         )
 
     try:
-        task = Task.objects.create(parent_id=parent_id)
+        task = Task.objects.create(parent_id=parent_id, text=text)
     except ParentDoesNotExist:
         return Response(
             {
