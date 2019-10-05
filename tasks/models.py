@@ -1,6 +1,6 @@
 import uuid
 
-from django.db import models, IntegrityError
+from django.db import models
 from django.utils import timezone
 
 from goals.models import Goal
