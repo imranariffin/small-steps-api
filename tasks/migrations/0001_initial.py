@@ -16,8 +16,18 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Task',
             fields=[
-                ('created', models.DateTimeField(default=django.utils.timezone.now)),
-                ('id', models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False)),
+                (
+                    'created',
+                    models.DateTimeField(default=django.utils.timezone.now),
+                ),
+                (
+                    'id',
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
             ],
         ),
     ]
