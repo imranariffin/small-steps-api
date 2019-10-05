@@ -24,7 +24,6 @@ class TestCreateTasks(TestCase):
 
         count_after = Task.objects.count()
         task_id = response.data['id']
-        task = Task.objects.get(id=task_id)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(
             response.json(),
