@@ -35,14 +35,17 @@ class TestTasksList(TestCase):
                     {
                         'id': str(task_third.id),
                         'created': '1970-01-01T12:34:53',
+                        'parent_id': str(goal_id),
                     },
                     {
                         'id': str(task_second.id),
                         'created': '1970-01-01T12:34:52',
+                        'parent_id': str(goal_id),
                     },
                     {
                         'id': str(task_first.id),
                         'created': '1970-01-01T12:34:51',
+                        'parent_id': str(goal_id),
                     },
                 ],
             },

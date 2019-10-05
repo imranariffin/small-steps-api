@@ -65,6 +65,7 @@ def tasks_list(request):
                     {
                         'id': task.id,
                         'created': task.created,
+                        'parent_id': task.parent_id,
                     }
                 ),
                 Task.objects.all().order_by('-created'),
