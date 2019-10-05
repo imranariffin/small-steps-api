@@ -44,7 +44,7 @@ def tasks_create(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    task = Task.objects.create()
+    task = Task.objects.create(parent_id=parent_id)
 
     return Response(
         {

@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from freezegun import freeze_time
 
+from goals.models import Goal
 from tasks.models import Task
 
 
@@ -13,12 +14,13 @@ class TestTasksList(TestCase):
         self.assertEqual(reverse('api:tasks-create-list'), '/v1/tasks/')
 
     def test_list_in_correct_order(self):
+        goal_id = Goal.objects.create().id
         with freeze_time('1970-01-01T12:34:51'):
-            task_first = Task.objects.create()
+            task_first = Task.objects.create(parent_id=goal_id)
         with freeze_time('1970-01-01T12:34:52'):
-            task_second = Task.objects.create()
+            task_second = Task.objects.create(parent_id=goal_id)
         with freeze_time('1970-01-01T12:34:53'):
-            task_third = Task.objects.create()
+            task_third = Task.objects.create(parent_id=goal_id)
 
         response = self.client.get(
             reverse('api:tasks-create-list'),
