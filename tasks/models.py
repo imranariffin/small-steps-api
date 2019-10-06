@@ -6,7 +6,6 @@ from django.utils import timezone
 from goals.models import Goal
 from tasks.exceptions import ParentDoesNotExist
 from tasks import choices
-from tasks import utils
 
 
 class Task(models.Model):
@@ -55,8 +54,19 @@ class Task(models.Model):
         except:
             return None
 
+    def get_siblings(self):
+        parent = self.get_parent()
+
+        if not parent:
+            return Task.objects.none()
+
+        return Task.objects\
+            .filter(parent_id=parent.id)\
+            .exclude(id=self.id)\
+            .order_by('-created')
+
     def get_subtasks(self):
-        return Task.objects.filter(parent_id=self.id)
+        return Task.objects.filter(parent_id=self.id).order_by('-created')
 
     def transition_to(self, status_next):
         self.status = status_next
