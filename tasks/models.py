@@ -47,3 +47,11 @@ class Task(models.Model):
                 )
         self.clean_fields()
         super().save(*args, **kwargs)
+
+    def transition_to(self, status_next):
+        self.status = status_next
+
+        for subtask in Task.objects.filter(parent_id=self.id):
+            subtask.transition_to(status_next)
+
+        self.save()
