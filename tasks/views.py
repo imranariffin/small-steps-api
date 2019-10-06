@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import JSONRenderer
@@ -15,6 +16,12 @@ def views(request):
 
     if request.method == 'GET':
         return tasks_list(request)
+
+
+@api_view(['PUT'])
+def views_status(request, task_id):
+    if request.method == 'PUT':
+        return tasks_status_update(request, task_id)
 
 
 def tasks_create(request):
@@ -63,6 +70,31 @@ def tasks_list(request):
                 ),
                 Task.objects.all().order_by('-created'),
             ))
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+def tasks_status_update(request, task_id):
+    status_next = request.data['status']
+
+    task = Task.objects.get(id=task_id)
+    task.status = status_next
+
+    try:
+        task.save()
+    except ValidationError:
+        return Response(
+            {
+                'status': f'Status {status_next} is not valid'
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    return Response(
+        {
+            'id': task.id,
+            'status': status_next,
         },
         status=status.HTTP_200_OK,
     )

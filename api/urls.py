@@ -28,4 +28,9 @@ urlpatterns = [
         tasks_views.views,
         name='tasks-create-list',
     ),
+    path(
+        'tasks/<uuid:task_id>/status/',
+        tasks_views.views_status,
+        name='tasks-status-update',
+    ),
 ]

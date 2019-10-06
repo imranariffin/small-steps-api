@@ -45,5 +45,5 @@ class Task(models.Model):
                 raise ParentDoesNotExist(
                     f'Parent with id {self.parent_id} does not exist'
                 )
-
+        self.clean_fields()
         super().save(*args, **kwargs)
