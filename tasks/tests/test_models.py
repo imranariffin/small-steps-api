@@ -51,3 +51,13 @@ class TestTaskModel(TestCase):
 
         count_after = Task.objects.all().count()
         self.assertEqual(count_after, count_before)
+
+    def test_initial_status(self):
+        goal_id = Goal.objects.create().id
+
+        task = Task.objects.create(
+            parent_id=goal_id,
+            text='some-text-0',
+        )
+
+        self.assertEqual(task.status, 'not_started')

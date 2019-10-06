@@ -5,6 +5,7 @@ from django.utils import timezone
 
 from goals.models import Goal
 from tasks.exceptions import ParentDoesNotExist
+from tasks import choices
 
 
 class Task(models.Model):
@@ -23,6 +24,13 @@ class Task(models.Model):
     text = models.CharField(
         blank=True,
         default=None,
+        max_length=200,
+        null=False,
+    )
+    status = models.CharField(
+        blank=False,
+        choices=choices.TASKS_STATUSES,
+        default=choices.NOT_STARTED,
         max_length=200,
         null=False,
     )
