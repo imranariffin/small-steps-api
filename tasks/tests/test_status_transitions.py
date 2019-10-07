@@ -157,11 +157,15 @@ class TestStatusTransitions(TestCase):
         │       ├── t1.2.2__completed
         │       └── t1.2.3__completed
         └── t2__completed
+            ├── t2.1__completed
+            │   └── t2.1.1__completed
+            └── t2.2__completed
         g1__in_progress
         g2__completed
 
         Transition t1.1.2: completed -> in_progress
         Transition t1.2.2: completed -> in_progress
+        Transition t2.1.1: completed -> in_progress
 
         g0__in_progress
         ├── t0__in_progress
@@ -173,7 +177,10 @@ class TestStatusTransitions(TestCase):
         │       ├── t1.2.1__completed
         │       ├── t1.2.2__in_progress
         │       └── t1.2.3__completed
-        └── t2__completed
+        └── t2__in_progress
+            ├── t2.1__in_progress
+            │   └── t2.1.1__in_progress
+            └── t2.2__completed
         g1__in_progress
         g2__completed
         """
@@ -184,7 +191,8 @@ class TestStatusTransitions(TestCase):
         g1 = Goal.objects.create(status='in_progress')
         g2 = Goal.objects.create(status='completed')
         (
-            t0, t1, t1_1, t1_1_1, t1_1_2, t1_2, t1_2_1, t1_2_2, t1_2_3, t2,
+            t0, t1, t1_1, t1_1_1, t1_1_2, t1_2, t1_2_1,
+            t1_2_2, t1_2_3, t2, t2_1, t2_1_1, t2_2,
         ) = setup_tasks(
             f"""id,parent_id,text,status
             6a844440-13a1-48fc-9974-0b0f2114eafa,e2617ee8-19e1-4f3a-9874-7c6bba6cd472,t0,in_progress
@@ -197,15 +205,19 @@ class TestStatusTransitions(TestCase):
             29aa2bca-ad56-4219-8f8e-b4d73d37789d,c8c453d8-349f-4ac6-a061-8a16973b09b8,t1.2.2,completed
             56f60eca-7821-44c2-a32e-46ff05d117f3,c8c453d8-349f-4ac6-a061-8a16973b09b8,t1.2.3,completed
             0406b08b-711e-4cc8-8698-987b4ea5a4c2,e2617ee8-19e1-4f3a-9874-7c6bba6cd472,t2,completed
+            00089b83-c081-4767-97cc-d3b14c14654d,0406b08b-711e-4cc8-8698-987b4ea5a4c2,t2.1,completed
+            d628712f-be7f-4b9a-87c4-61a6e8b37041,00089b83-c081-4767-97cc-d3b14c14654d,t2.1.1,completed
+            bdbf2b33-8d12-490b-8b81-ceee91f53afb,0406b08b-711e-4cc8-8698-987b4ea5a4c2,t2.2,completed
             """
         )
 
         t1_1_2.transition_to('in_progress')
         t1_2_2.transition_to('in_progress')
+        t2_1_1.transition_to('in_progress')
 
         self._refresh_from_db(
             g0, t0, t1, t1_1, t1_1_1, t1_1_2, t1_2, t1_2_1, t1_2_2, t1_2_3,
-            t2, g1, g2
+            t2, t2_1, t2_1_1, t2_2, g1, g2
         )
         self.assertEqual(g0.status, 'in_progress')
         self.assertEqual(t0.status, 'in_progress')
@@ -217,7 +229,10 @@ class TestStatusTransitions(TestCase):
         self.assertEqual(t1_2_1.status, 'completed')
         self.assertEqual(t1_2_2.status, 'in_progress')
         self.assertEqual(t1_2_3.status, 'completed')
-        self.assertEqual(t2.status, 'completed')
+        self.assertEqual(t2.status, 'in_progress')
+        self.assertEqual(t2_1.status, 'in_progress')
+        self.assertEqual(t2_1_1.status, 'in_progress')
+        self.assertEqual(t2_2.status, 'completed')
         self.assertEqual(g1.status, 'in_progress')
         self.assertEqual(g2.status, 'completed')
 
