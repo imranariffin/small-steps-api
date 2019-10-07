@@ -48,9 +48,6 @@ class Task(models.Model):
         self.clean_fields()
         super().save(*args, **kwargs)
 
-    def get_goal(self):
-        return goals_models.Goal.objects.get(id=self.parent_id)
-
     def get_parent(self):
         try:
             return Task.objects.get(id=self.parent_id)
@@ -86,11 +83,6 @@ class Task(models.Model):
 
         if self.status == 'completed' and status_next == 'in_progress':
             self._transition_to(status_next, transition_parent=True)
-
-    def _transition_all_to(self, status_next):
-        self._transition_to(status_next)
-        for subtask in self.get_subtasks():
-            subtask._transition_all_to(status_next)
 
     def _transition_to(self, status_next, transition_parent=False):
         if transition_parent:
