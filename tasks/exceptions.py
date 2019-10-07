@@ -7,3 +7,7 @@ class ParentDoesNotExist(IntegrityError):
 
 class StatusTransitionError(Exception):
     pass
+
+
+class InvalidStatusTransition(Exception):
+    pass

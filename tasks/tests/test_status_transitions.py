@@ -2,6 +2,7 @@ from django.test import TestCase
 
 from goals.models import Goal
 from tasks.tests.helpers import setup_tasks
+from tasks.exceptions import InvalidStatusTransition
 
 
 class TestStatusTransitions(TestCase):
@@ -242,6 +243,27 @@ class TestStatusTransitions(TestCase):
     def test_transition_parent(self):
         for status_next in ['in_progress', 'completed']:
             pass
+
+    def test_transition_jump(self):
+        """
+        g0__not_started
+        └── t0__not_started
+        """
+        g0 = Goal.objects.create(
+            id='e2617ee8-19e1-4f3a-9874-7c6bba6cd472',
+            status='not_started',
+        )
+        (t0,) = setup_tasks(
+            f"""id,parent_id,text,status
+            6a844440-13a1-48fc-9974-0b0f2114eafa,e2617ee8-19e1-4f3a-9874-7c6bba6cd472,t0,not_started
+            """
+        )
+
+        with self.assertRaises(InvalidStatusTransition):
+            t0.transition_to('completed')
+
+        self.assertEqual(t0.status, 'not_started')
+        self.assertEqual(g0.status, 'not_started')
 
     def _refresh_from_db(self, *args):
         for model in args:
