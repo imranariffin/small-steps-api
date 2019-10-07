@@ -5,7 +5,7 @@ from tasks.tests.helpers import setup_tasks
 
 
 class TestStatusTransitions(TestCase):
-    def test_transition_subtask_from_not_started_to_in_progress(self):
+    def test_transition_from_not_started_to_in_progress(self):
         """
         g0__not_started
         ├── t0__not_started
@@ -74,7 +74,7 @@ class TestStatusTransitions(TestCase):
         self.assertEqual(g1.status, 'in_progress')
         self.assertEqual(g2.status, 'completed')
 
-    def test_transition_subtask_from_in_progress_to_completed(self):
+    def test_transition_from_in_progress_to_completed(self):
         """
         g0__in_progress
         ├── t0__in_progress
