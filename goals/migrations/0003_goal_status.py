@@ -13,6 +13,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='goal',
             name='status',
-            field=models.CharField(choices=[('not_started', 'Task has not been started'), ('in_progress', 'Task has been started and is in progress'), ('completed', 'Task has been completed')], default='not_started', max_length=200),
+            field=models.CharField(
+                choices=[
+                    ('not_started', 'Task has not been started'),
+                    ('in_progress', (
+                        'Task has been started and is in progress'
+                    )),
+                    ('completed', 'Task has been completed'),
+                ],
+                default='not_started',
+                max_length=200,
+            ),
         ),
     ]

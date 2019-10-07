@@ -54,14 +54,8 @@ class Task(models.Model):
     def get_parent(self):
         try:
             return Task.objects.get(id=self.parent_id)
-        except:
-            return None
-
-    def get_goal(self):
-        parent = self.get_parent()
-        if parent:
-            return parent.get_goal()
-        return goals_models.Goal.objects.get(id=self.parent_id)
+        except Task.DoesNotExist:
+            return goals_models.Goal.objects.get(id=self.parent_id)
 
     def get_siblings(self):
         parent = self.get_parent()
@@ -85,17 +79,21 @@ class Task(models.Model):
             raise StatusTransitionError()
 
         if self.status == 'not_started' and status_next == 'in_progress':
-            goal = self.get_goal()
-            goal.transition_to('in_progress')
-            return
+            self._transition_to(status_next, transition_parent=True)
 
-        self._transition_to(status_next)
+        if self.status == 'in_progress' and status_next == 'completed':
+            self._transition_to(status_next)
 
     def _transition_all_to(self, status_next):
         self._transition_to(status_next)
         for subtask in self.get_subtasks():
             subtask._transition_all_to(status_next)
 
-    def _transition_to(self, status_next):
+    def _transition_to(self, status_next, transition_parent=False):
+        if transition_parent:
+            self.get_parent()._transition_to(
+                status_next,
+                transition_parent=True,
+            )
         self.status = status_next
         self.save()

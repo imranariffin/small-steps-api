@@ -36,9 +36,7 @@ class Goal(models.Model):
     def get_tasks(self):
         return tasks_models.Task.objects.filter(parent_id=self.id)
 
-    def transition_to(self, status_next):
-        for task in self.get_tasks():
-            task._transition_all_to(status_next)
+    def _transition_to(self, status_next, transition_parent=False):
         self.status = status_next
         self.save()
 

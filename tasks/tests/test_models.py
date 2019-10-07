@@ -63,12 +63,12 @@ class TestTaskModel(TestCase):
         self.assertEqual(task.status, 'not_started')
 
     def test_get_parent_goal(self):
-        goal_id = Goal.objects.create().id
-        task = Task.objects.create(parent_id=goal_id, text='some-text-0')
+        goal = Goal.objects.create()
+        task = Task.objects.create(parent_id=goal.id, text='some-text-0')
 
         parent = task.get_parent()
 
-        self.assertEqual(parent, None)
+        self.assertEqual(parent, goal)
 
     def test_get_parent_task(self):
         goal_id = Goal.objects.create().id
