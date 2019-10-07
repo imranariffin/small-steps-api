@@ -84,6 +84,12 @@ class Task(models.Model):
         if self.status == 'in_progress' and status_next == 'completed':
             self._transition_to(status_next)
 
+        if self.status == 'completed' and status_next == 'in_progress':
+            self._transition_to(status_next)
+            siblings = self.get_siblings()
+            if self.get_parent().status == 'completed':
+                self.get_parent()._transition_to('in_progress')
+
     def _transition_all_to(self, status_next):
         self._transition_to(status_next)
         for subtask in self.get_subtasks():
