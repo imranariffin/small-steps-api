@@ -335,7 +335,7 @@ class TestStatusTransitions(TestCase):
                 ├── t1.2.1__in_progress
                 └── t1.2.2__in_progress
         """
-        Goal.objects.create(id='e2617ee8-19e1-4f3a-9874-7c6bba6cd472')
+        goal = Goal.objects.create(id='e2617ee8-19e1-4f3a-9874-7c6bba6cd472')
         (
             t0,
             t1,
@@ -358,6 +358,7 @@ class TestStatusTransitions(TestCase):
 
         t1_2_1.transition_to('in_progress')
 
+        goal.refresh_from_db()
         t0.refresh_from_db()
         t1.refresh_from_db()
         t1_1.refresh_from_db()
@@ -365,6 +366,7 @@ class TestStatusTransitions(TestCase):
         t1_2.refresh_from_db()
         t1_2_1.refresh_from_db()
         t1_2_2.refresh_from_db()
+        self.assertEqual(goal.status, 'in_progress')
         self.assertEqual(t0.status, 'in_progress')
         self.assertEqual(t1.status, 'in_progress')
         self.assertEqual(t1_1.status, 'in_progress')
