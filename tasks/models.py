@@ -3,8 +3,8 @@ import uuid
 from django.db import models
 from django.utils import timezone
 
-from goals.models import Goal
-from tasks.exceptions import ParentDoesNotExist
+from goals import models as goals_models
+from tasks.exceptions import ParentDoesNotExist, StatusTransitionError
 from tasks import choices
 
 
@@ -37,8 +37,8 @@ class Task(models.Model):
 
     def save(self, *args, **kwargs):
         try:
-            Goal.objects.get(id=self.parent_id)
-        except Goal.DoesNotExist:
+            goals_models.Goal.objects.get(id=self.parent_id)
+        except goals_models.Goal.DoesNotExist:
             try:
                 Task.objects.get(id=self.parent_id)
             except Task.DoesNotExist:
@@ -48,11 +48,20 @@ class Task(models.Model):
         self.clean_fields()
         super().save(*args, **kwargs)
 
+    def get_goal(self):
+        return goals_models.Goal.objects.get(id=self.parent_id)
+
     def get_parent(self):
         try:
             return Task.objects.get(id=self.parent_id)
         except:
             return None
+
+    def get_goal(self):
+        parent = self.get_parent()
+        if parent:
+            return parent.get_goal()
+        return goals_models.Goal.objects.get(id=self.parent_id)
 
     def get_siblings(self):
         parent = self.get_parent()
@@ -68,17 +77,25 @@ class Task(models.Model):
     def get_subtasks(self):
         return Task.objects.filter(parent_id=self.id).order_by('-created')
 
+    def has_subtasks(self):
+        return len(self.get_subtasks()) > 0
+
     def transition_to(self, status_next):
+        if self.has_subtasks():
+            raise StatusTransitionError()
+
+        if self.status == 'not_started' and status_next == 'in_progress':
+            goal = self.get_goal()
+            goal.transition_to('in_progress')
+            return
+
+        self._transition_to(status_next)
+
+    def _transition_all_to(self, status_next):
+        self._transition_to(status_next)
+        for subtask in self.get_subtasks():
+            subtask._transition_all_to(status_next)
+
+    def _transition_to(self, status_next):
         self.status = status_next
-
-        for subtask in Task.objects.filter(parent_id=self.id):
-            subtask.transition_to(status_next)
-
-        if all(map(
-                lambda t: t.status == status_next and utils.is_upgrade(t.status, status_next),
-                self.get_siblings(),
-        )):
-            if self.get_parent():
-                self.get_parent().transition_to(status_next)
-
         self.save()
