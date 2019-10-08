@@ -63,10 +63,11 @@ class Task(models.Model):
         if not parent:
             return Task.objects.none()
 
-        return Task.objects\
+        ret = Task.objects\
             .filter(parent_id=parent.id)\
             .exclude(id=self.id)\
             .order_by('-created')
+        return ret
 
     def get_subtasks(self):
         return Task.objects.filter(parent_id=self.id).order_by('-created')
@@ -78,23 +79,34 @@ class Task(models.Model):
         if self.has_subtasks():
             raise InvalidStatusTransition
 
-        if self.status == 'not_started' and status_next == 'in_progress':
-            self._transition_to(status_next, transition_parent=True)
-
-        if self.status == 'in_progress' and status_next == 'completed':
-            self._transition_to(status_next)
-
-        if self.status == 'completed' and status_next == 'in_progress':
-            self._transition_to(status_next, transition_parent=True)
-
         if self.status == 'not_started' and status_next == 'completed':
             raise InvalidStatusTransition
 
+        status = self.status
+        if (
+                status == 'not_started' and status_next == 'in_progress' or
+                status == 'in_progress' and status_next == 'completed' or
+                status == 'completed' and status_next == 'in_progress' or
+                status == 'in_progress' and status_next == 'not_started'
+        ):
+            self._transition_to(status_next)
+
     def _transition_to(self, status_next, transition_parent=False):
-        if transition_parent:
-            self.get_parent()._transition_to(
-                status_next,
-                transition_parent=True,
-            )
+        should_parent_transition = self._should_parent_transition(status_next)
+
+        if should_parent_transition:
+            self.get_parent()._transition_to(status_next)
+
         self.status = status_next
         self.save()
+
+    def _should_parent_transition(self, status_next):
+        if status_next == 'in_progress':
+            return self.get_parent().status != 'in_progress'
+
+        return all(
+            map(
+                lambda s: s.status == status_next,
+                self.get_siblings(),
+            ),
+        )

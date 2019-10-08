@@ -238,7 +238,79 @@ class TestStatusTransitions(TestCase):
         self.assertEqual(g2.status, 'completed')
 
     def test_transition_from_in_progress_to_not_started(self):
-        pass
+        """
+        g0__in_progress
+        ├── t0__not_started
+        └── t1__in_progress
+            ├── t1.1__in_progress
+            │   └── t1.1.1__in_progress
+            │   └── t1.1.2__in_progress
+            └── t1.2__in_progress
+                ├── t1.2.1__in_progress
+                └── t1.2.2__not_started
+
+        Transition t1.1.1: in_progress -> not_started
+        Transition t1.2.1: in_progress -> not_started
+
+        g0__in_progress
+        ├── t0__not_started
+        └── t1__in_progress
+            ├── t1.1__in_progress
+            │   └── t1.1.1__not_started
+            │   └── t1.1.2__in_progress
+            └── t1.2__not_started
+                ├── t1.2.1__not_started
+                └── t1.2.2__not_started
+        """
+        g0 = Goal.objects.create(
+            id='e2617ee8-19e1-4f3a-9874-7c6bba6cd472',
+            status='in_progress',
+        )
+        (
+            t0, t1, t1_1, t1_1_1, t1_1_2, t1_2, t1_2_1, t1_2_2,
+        ) = setup_tasks(
+            """id,parent_id,text,status
+            6a844440-13a1-48fc-9974-0b0f2114eafa,e2617ee8-19e1-4f3a-9874-7c6bba6cd472,t0,not_started
+            d628712f-be7f-4b9a-87c4-61a6e8b37041,e2617ee8-19e1-4f3a-9874-7c6bba6cd472,t1,in_progress
+            53a6485e-3473-49bd-bc9d-2fe1d3a9707e,d628712f-be7f-4b9a-87c4-61a6e8b37041,t1.1,in_progress
+            033f3ae4-659d-47ff-a53b-e2579a9a643c,53a6485e-3473-49bd-bc9d-2fe1d3a9707e,t1.1.1,in_progress
+            c8c453d8-349f-4ac6-a061-8a16973b09b8,53a6485e-3473-49bd-bc9d-2fe1d3a9707e,t1.1.2,in_progress
+            00089b83-c081-4767-97cc-d3b14c14654d,d628712f-be7f-4b9a-87c4-61a6e8b37041,t1.2,in_progress
+            f0a8399e-4941-407d-aba5-1312d16c2ed8,00089b83-c081-4767-97cc-d3b14c14654d,t1.2.1,in_progress
+            a5da4c15-8fa7-4948-8549-3d3c14f903f4,00089b83-c081-4767-97cc-d3b14c14654d,t1.2.2,not_started
+            """
+        )
+
+        self.assertEqual(t1_2_2.status, 'not_started')
+        self.assertEqual(t1_2_1.status, 'in_progress')
+        self.assertEqual(t1_2.status, 'in_progress')
+        self.assertEqual(t1_1_2.status, 'in_progress')
+        self.assertEqual(t1_1_1.status, 'in_progress')
+        self.assertEqual(t1_1.status, 'in_progress')
+        self.assertEqual(t1.status, 'in_progress')
+        self.assertEqual(t0.status, 'not_started')
+        self.assertEqual(g0.status, 'in_progress')
+
+        t1_1_1.transition_to('not_started')
+
+        self._refresh_from_db(
+            t0, t1, t1_1, t1_1_1, t1_1_2, t1_2, t1_2_1, t1_2_2,
+        )
+
+        t1_2_1.transition_to('not_started')
+
+        self._refresh_from_db(
+            t0, t1, t1_1, t1_1_1, t1_1_2, t1_2, t1_2_1, t1_2_2,
+        )
+        self.assertEqual(t1_2_2.status, 'not_started')
+        self.assertEqual(t1_2_1.status, 'not_started')
+        self.assertEqual(t1_2.status, 'not_started')
+        self.assertEqual(t1_1_2.status, 'in_progress')
+        self.assertEqual(t1_1_1.status, 'not_started')
+        self.assertEqual(t1_1.status, 'in_progress')
+        self.assertEqual(t1.status, 'in_progress')
+        self.assertEqual(t0.status, 'not_started')
+        self.assertEqual(g0.status, 'in_progress')
 
     def test_transition_parent(self):
         """
