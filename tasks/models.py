@@ -81,19 +81,10 @@ class Task(models.Model):
         if self.status == 'not_started' and status_next == 'completed':
             raise InvalidStatusTransition
 
-        status = self.status
-        if (
-                status == 'not_started' and status_next == 'in_progress' or
-                status == 'in_progress' and status_next == 'completed' or
-                status == 'completed' and status_next == 'in_progress' or
-                status == 'in_progress' and status_next == 'not_started'
-        ):
-            self._transition_to(status_next)
+        self._transition_to(status_next)
 
-    def _transition_to(self, status_next, transition_parent=False):
-        should_parent_transition = self._should_parent_transition(status_next)
-
-        if should_parent_transition:
+    def _transition_to(self, status_next):
+        if self._should_parent_transition(status_next):
             self.get_parent()._transition_to(status_next)
 
         self.status = status_next
