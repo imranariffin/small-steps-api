@@ -63,11 +63,10 @@ class Task(models.Model):
         if not parent:
             return Task.objects.none()
 
-        ret = Task.objects\
+        return Task.objects\
             .filter(parent_id=parent.id)\
             .exclude(id=self.id)\
             .order_by('-created')
-        return ret
 
     def get_subtasks(self):
         return Task.objects.filter(parent_id=self.id).order_by('-created')
