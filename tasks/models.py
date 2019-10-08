@@ -6,7 +6,6 @@ from django.utils import timezone
 from goals import models as goals_models
 from tasks.exceptions import (
     ParentDoesNotExist,
-    StatusTransitionError,
     InvalidStatusTransition
 )
 from tasks import choices
@@ -77,7 +76,7 @@ class Task(models.Model):
 
     def transition_to(self, status_next):
         if self.has_subtasks():
-            raise StatusTransitionError()
+            raise InvalidStatusTransition
 
         if self.status == 'not_started' and status_next == 'in_progress':
             self._transition_to(status_next, transition_parent=True)
@@ -89,7 +88,7 @@ class Task(models.Model):
             self._transition_to(status_next, transition_parent=True)
 
         if self.status == 'not_started' and status_next == 'completed':
-            raise InvalidStatusTransition()
+            raise InvalidStatusTransition
 
     def _transition_to(self, status_next, transition_parent=False):
         if transition_parent:
