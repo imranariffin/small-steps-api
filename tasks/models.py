@@ -3,8 +3,12 @@ import uuid
 from django.db import models
 from django.utils import timezone
 
-from goals.models import Goal
-from tasks.exceptions import ParentDoesNotExist
+from goals import models as goals_models
+from tasks.exceptions import (
+    ParentDoesNotExist,
+    InvalidStatusTransition
+)
+from tasks import choices
 
 
 class Task(models.Model):
@@ -26,16 +30,73 @@ class Task(models.Model):
         max_length=200,
         null=False,
     )
+    status = models.CharField(
+        blank=False,
+        choices=choices.TASKS_STATUSES,
+        default=choices.NOT_STARTED,
+        max_length=200,
+        null=False,
+    )
 
     def save(self, *args, **kwargs):
         try:
-            Goal.objects.get(id=self.parent_id)
-        except Goal.DoesNotExist:
+            goals_models.Goal.objects.get(id=self.parent_id)
+        except goals_models.Goal.DoesNotExist:
             try:
                 Task.objects.get(id=self.parent_id)
             except Task.DoesNotExist:
                 raise ParentDoesNotExist(
                     f'Parent with id {self.parent_id} does not exist'
                 )
-
+        self.clean_fields()
         super().save(*args, **kwargs)
+
+    def get_parent(self):
+        try:
+            return Task.objects.get(id=self.parent_id)
+        except Task.DoesNotExist:
+            return goals_models.Goal.objects.get(id=self.parent_id)
+
+    def get_siblings(self):
+        parent = self.get_parent()
+
+        if not parent:
+            return Task.objects.none()
+
+        return Task.objects\
+            .filter(parent_id=parent.id)\
+            .exclude(id=self.id)\
+            .order_by('-created')
+
+    def get_subtasks(self):
+        return Task.objects.filter(parent_id=self.id).order_by('-created')
+
+    def has_subtasks(self):
+        return len(self.get_subtasks()) > 0
+
+    def transition_to(self, status_next):
+        if self.has_subtasks():
+            raise InvalidStatusTransition
+
+        if self.status == 'not_started' and status_next == 'completed':
+            raise InvalidStatusTransition
+
+        self._transition_to(status_next)
+
+    def _transition_to(self, status_next):
+        if self._should_parent_transition(status_next):
+            self.get_parent()._transition_to(status_next)
+
+        self.status = status_next
+        self.save()
+
+    def _should_parent_transition(self, status_next):
+        if status_next == 'in_progress':
+            return self.get_parent().status != 'in_progress'
+
+        return all(
+            map(
+                lambda s: s.status == status_next,
+                self.get_siblings(),
+            ),
+        )
