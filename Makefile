@@ -26,6 +26,7 @@ local:
 		--publish 8000:8000 \
 		--volume `pwd`/app:/home/appuser/app \
 		--network small-steps-api-network \
+		--env-file .env \
 		--entrypoint ./app/scripts/api.local.sh \
 		small-steps-api
 
