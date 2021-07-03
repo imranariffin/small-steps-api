@@ -10,14 +10,12 @@ ENV VIRTUAL_ENV=./.venv
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-RUN which python && which python3 && which pip
-
-RUN python -m pip install --upgrade pip
-
 # Install dependencies
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+COPY app/requirements.txt ./app/requirements.txt
+RUN python -m pip install --upgrade pip
+RUN pip install -r ./app/requirements.txt
 
 # Run application
-EXPOSE 80
-ENTRYPOINT ["uvicorn", "app.main:api", "--host", "0.0.0.0", "--port", "80"]
+COPY app/ app/
+EXPOSE 8000
+ENTRYPOINT ["uvicorn", "app.api:api", "--host", "0.0.0.0", "--port", "8000"]
