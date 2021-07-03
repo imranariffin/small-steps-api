@@ -1,6 +1,2 @@
-django
-flake8
-gunicorn
-django-heroku
-djangorestframework
-freezegun
+fastapi==0.65.3
+SQLAlchemy==1.4.20
