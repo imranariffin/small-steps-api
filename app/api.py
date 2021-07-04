@@ -1,5 +1,5 @@
 from os import environ
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from fastapi import Depends, FastAPI
 from pydantic import BaseModel
@@ -21,10 +21,14 @@ class GoalsResponse(BaseModel):
 def root():
     def get_base_url() -> str:
         return f"http://{environ['API_HOST']}:{environ['API_PORT']}"
-    return {
-        route.name: f"{get_base_url()}{route.path}"
-        for route in api.routes
-    }
+
+    def get_routes_map(routes: List) -> Dict[str, str]:
+        return {
+            route.name: f"{get_base_url()}{route.path}"
+            for route in routes
+        }
+
+    return get_routes_map(api.routes)
 
 
 @api.get("/goals", response_model=List[GoalsResponse])
