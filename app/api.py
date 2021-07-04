@@ -1,3 +1,4 @@
+from os import environ
 from typing import List, Optional
 
 from fastapi import Depends, FastAPI
@@ -18,7 +19,12 @@ class GoalsResponse(BaseModel):
 
 @api.get("/")
 def root():
-    return {}
+    def get_base_url() -> str:
+        return f"http://{environ['API_HOST']}:{environ['API_PORT']}"
+    return {
+        route.name: f"{get_base_url()}{route.path}"
+        for route in api.routes
+    }
 
 
 @api.get("/goals", response_model=List[GoalsResponse])

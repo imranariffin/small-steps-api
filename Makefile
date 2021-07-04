@@ -12,7 +12,6 @@ local_bash:
 		-it \
 		--rm \
 		--name small-steps-api-bash \
-		--publish 8000:8000 \
 		--volume `pwd`/app:/home/appuser/app \
 		--network small-steps-api-network \
 		--entrypoint bash \
