@@ -17,22 +17,24 @@ ENV VIRTUAL_ENV=$HOME/.venv
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Build production and dev a little bit differently
+COPY ./requirements-base.txt ./requirements-base.txt
+
+# Build production and dev/test a little bit differently
 FROM build_base as build_dev
 ONBUILD COPY tests/ tests/
-ONBUILD COPY ./requirements-dev.txt ./requiremens-dev.txt
+ONBUILD COPY requirements-dev.txt requirements-dev.txt
+ONBUILD RUN cat ./requirements-base.txt ./requirements-dev.txt | sort > ./requirements.txt
+FROM build_dev as build_test
 FROM build_base as build_production
 ONBUILD RUN echo "Skipping tests/ folder & requirements-dev.txt in production build"
+ONBUILD RUN cat ./requirements-base.txt > ./requirements.txt
 FROM build_${BUILD_ENV}
 
 # Install dependencies
-COPY ./requirements-base.txt ./requirements-base.txt
-RUN touch ./requirements-dev.txt \
-    && cat ./requirements-base.txt ./requirements-dev.txt | sort > ./requirements.txt \
-    && python -m pip install --upgrade pip \
+RUN python -m pip install --upgrade pip \
     && pip install -r ./requirements.txt
 
 # Run application
 COPY app/ app/
 EXPOSE 8000
-ENTRYPOINT ["uvicorn", "app.api:api", "--host", "0.0.0.0", "--port", "8000"]
+ENTRYPOINT ["/bin/bash", "./app/scripts/api.${BUILD_ENV}.sh"]

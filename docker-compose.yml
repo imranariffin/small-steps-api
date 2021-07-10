@@ -1,0 +1,48 @@
+# HostName/ServiceName/ResourceName format: small-steps-api-<BUILD_ENV>-<service/resource>
+
+version: '3.2'
+services:
+  api:
+    build: .
+    entrypoint: /bin/bash ./app/entrypoints/api.${BUILD_ENV}.sh
+    image: small-steps-api-${BUILD_ENV}:${TAG}
+    hostname: small-steps-api-${BUILD_ENV}-api
+    container_name: small-steps-api-${BUILD_ENV}-api
+    env_file:
+      - .env.${BUILD_ENV}
+    depends_on:
+      - db
+      - run_migrations
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./app
+        target: /home/appuser/app
+    networks:
+      - backend
+
+  db:
+    image: postgres:11.3
+    hostname: small-steps-api-${BUILD_ENV}-db
+    container_name: small-steps-api-${BUILD_ENV}-db
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+
+  run_migrations:
+    image: small-steps-api-${BUILD_ENV}:${TAG}
+    entrypoint: /bin/bash ./app/entrypoints/run_migrations.sh
+    container_name: small-steps-api-${BUILD_ENV}-run_migrations
+    env_file:
+      - .env.${BUILD_ENV}
+    networks:
+      - backend
+    depends_on:
+      - db
+
+networks:
+    backend:
+      name: small-steps-api-${BUILD_ENV}-network
