@@ -9,4 +9,4 @@ fi
 
 python ./scripts/create_db.py
 alembic --config ./alembic.ini upgrade head
-python -m pytest -vvv
+python -m pytest -vvv --log-level=$LOG_LEVEL
