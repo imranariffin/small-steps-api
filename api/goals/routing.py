@@ -4,9 +4,9 @@ from fastapi import Depends
 from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
-from app.database.orm import get_db
-from app.goals.api_schemas import GoalCreateRequest, GoalsResponse
-from app.goals.repositories import GoalsRepository
+from database.orm import get_db
+from goals.api_schemas import GoalCreateRequest, GoalsResponse
+from goals.repositories import GoalsRepository
 
 router = APIRouter()
 

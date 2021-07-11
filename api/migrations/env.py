@@ -16,7 +16,7 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from app.goals.models import Goal
+from goals.models import Goal
 target_metadata = Goal.metadata
 
 # other values from the config, defined by the needs of env.py,

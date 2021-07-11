@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 
-from app.database.orm import BaseModel
+from database.orm import BaseModel
 
 
 class Goal(BaseModel):

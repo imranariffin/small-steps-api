@@ -3,7 +3,7 @@ from typing import Dict, List
 
 from fastapi import FastAPI
 
-from app.goals.routing import router as goals_router
+from goals.routing import router as goals_router
 
 api = FastAPI()
 

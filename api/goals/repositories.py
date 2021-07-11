@@ -2,8 +2,8 @@ import typing as t
 
 from sqlalchemy.orm import Session
 
-from app.goals.api_schemas import GoalCreateRequest
-from app.goals.models import Goal
+from goals.api_schemas import GoalCreateRequest
+from goals.models import Goal
 
 
 class GoalsRepository:

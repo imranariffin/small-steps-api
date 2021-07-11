@@ -3,8 +3,8 @@
 version: '3.2'
 services:
   api:
-    build: .
-    entrypoint: /bin/bash ./app/entrypoints/api.${BUILD_ENV}.sh
+    build: api/
+    entrypoint: ./entrypoints/api.${BUILD_ENV}.sh
     image: small-steps-api-${BUILD_ENV}:${TAG}
     hostname: small-steps-api-${BUILD_ENV}-api
     container_name: small-steps-api-${BUILD_ENV}-api
@@ -18,8 +18,8 @@ services:
     restart: unless-stopped
     volumes:
       - type: bind
-        source: ./app
-        target: /home/appuser/app
+        source: ./api/
+        target: /home/appuser/api/
     networks:
       - backend
 
@@ -33,11 +33,16 @@ services:
       - backend
 
   run_migrations:
+    build: api
     image: small-steps-api-${BUILD_ENV}:${TAG}
-    entrypoint: /bin/bash ./app/entrypoints/run_migrations.sh
+    entrypoint: ./entrypoints/run_migrations.sh
     container_name: small-steps-api-${BUILD_ENV}-run_migrations
     env_file:
       - .env.${BUILD_ENV}
+    volumes:
+      - type: bind
+        source: ./api/
+        target: /home/appuser/api/
     networks:
       - backend
     depends_on:

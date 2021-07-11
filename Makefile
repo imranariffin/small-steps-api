@@ -1,45 +1,46 @@
+.PHONY: api
+
 image_tag = small-steps-api-$(BUILD_ENV)
 
 api:
-	docker-compose --env-file .env.$(BUILD_ENV) up
+	docker-compose --env-file .env.$(BUILD_ENV) up api
 
-build:
-	docker build -t $(image_tag) --build-arg BUILD_ENV=$(BUILD_ENV) .
+api_build:
+	docker build -t $(image_tag) --build-arg BUILD_ENV=$(BUILD_ENV) ./api
 
-build_nocache:
-	docker build -t $(image_tag) --build-arg BUILD_ENV=$(BUILD_ENV) --no-cache .
+api_build_nocache:
+	docker build -t $(image_tag) --build-arg BUILD_ENV=$(BUILD_ENV) --no-cache ./api
 
-bash:
+api_bash:
 	docker-compose --env-file .env.$(BUILD_ENV) \
-		exec \
+		run \
 		--rm \
-		-it \
 		--name $(image_tag)-bash \
-		api \
-		bash
+		--entrypoint /bin/bash \
+		api
 
-make_migrations:
+api_make_migrations:
 	docker-compose --env-file .env.$(BUILD_ENV) \
 		run \
 		--rm \
 		--name $(image_tag)-make-migrations \
 		-e REVISION_NAME_SUFFIX=$(REVISION_NAME_SUFFIX) \
-		--entrypoint ./app/entrypoints/make_migrations.sh \
+		--entrypoint ./entrypoints/make_migrations.sh \
 		api \
 		|| echo "Hint: Run make REVISION_NAME_SUFFIX=<you-revision-name-suffix> make_migrations"
 
-run_migrations:
+api_run_migrations:
 	docker-compose --env-file .env.$(BUILD_ENV) \
 		run \
 		--name $(image_tag)-run-migrations \
 		--rm \
-		--entrypoint ./app/entrypoints/run_migrations.sh \
-		api
+		run_migrations
 
-run_tests:
-	docker-compose --env-file .env.test \
+api_run_tests:
+	./scripts/check_build_env.sh test \
+	&& docker-compose --env-file .env.$(BUILD_ENV) \
 		run \
-		--name $(image_tag)-api \
+		--name small-steps-api-$(BUILD_ENV)-api \
 		--rm \
-		--entrypoint ./app/entrypoints/api.$(BUILD_ENV).sh \
+		--entrypoint ./entrypoints/api.$(BUILD_ENV).sh \
 		api
