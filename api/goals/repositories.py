@@ -13,6 +13,9 @@ class GoalsRepository:
     def get_all(self) -> t.List[Goal]:
         return self.db.query(Goal).all()
 
+    def get_by_id(self, id: int) -> t.Optional[Goal]:
+        return self.db.query(Goal).filter(Goal.id == id).first()
+
     def create(self, *, goal_create: GoalCreateRequest) -> Goal:
         goal: Goal = Goal(**goal_create.dict())
         self.db.add(goal)

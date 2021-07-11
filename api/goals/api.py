@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import Depends
+from fastapi import Depends, Path, HTTPException
 from fastapi.routing import APIRouter
 from sqlalchemy.orm import Session
 
@@ -20,4 +20,18 @@ def get_all_goals(db: Session = Depends(get_db)):
 @router.post("/", response_model=GoalsResponse)
 def create_goal(goal_create: GoalCreateRequest, db: Session = Depends(get_db)):
     goal = GoalsRepository(db=db).create(goal_create=goal_create)
+    return goal
+
+
+@router.get("/{goal_id}", response_model=GoalsResponse)
+def retrieve_goal(
+    goal_id: int = Path(default=None, title="Goal ID to query by"),
+    db: Session = Depends(get_db),
+):
+    goal = GoalsRepository(db=db).get_by_id(id=goal_id)
+    if goal is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Goal with id={goal_id} does not exist",
+        )
     return goal
