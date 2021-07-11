@@ -1,6 +1,0 @@
-django
-flake8
-gunicorn
-django-heroku
-djangorestframework
-freezegun
